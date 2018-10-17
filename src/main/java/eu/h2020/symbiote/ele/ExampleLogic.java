@@ -86,7 +86,7 @@ public class ExampleLogic implements ProcessingLogic {
 
         //queryParisTemperature();
 
-        queryAir();
+        // queryAir();
     }
 
     String queryAir() {
