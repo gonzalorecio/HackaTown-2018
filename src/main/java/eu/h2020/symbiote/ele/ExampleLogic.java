@@ -93,6 +93,7 @@ public class ExampleLogic implements ProcessingLogic {
         
         //asyncCommunication();
         //syncCommunication();
+        System.out.println("Lmaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaooooo");
 
         queryParisTemperature();
     }
