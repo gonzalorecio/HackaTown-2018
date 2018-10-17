@@ -1,0 +1,122 @@
+buildscript {
+    ext {
+        springBootVersion = '1.5.14.RELEASE'
+        springCloudVersion = 'Dalston.SR5'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.0.RELEASE"
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath group: 'com.cinnober.gradle', name: 'semver-git', version: '2.2.1'    
+    }
+}
+
+// code
+apply plugin: "io.spring.dependency-management"
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+
+// IDEs
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+// publishing
+apply plugin: 'com.cinnober.gradle.semver-git'
+apply plugin: 'maven-publish'
+
+project.group = 'eu.h2020.symbiote'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+// Spring related configs
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+configurations.all {
+    // check for updates every build
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+dependencies {
+
+    // Spring
+    compile('org.springframework.cloud:spring-cloud-starter-config')
+    compile('org.springframework.cloud:spring-cloud-starter-eureka')
+    compile('org.springframework.cloud:spring-cloud-starter-zipkin')
+    compile('org.springframework.retry:spring-retry')
+    compile('org.springframework.boot:spring-boot-starter-aop')
+    
+    // from jitpack
+    compile('com.github.symbiote-h2020:EnablerLogic:0.5+')
+    
+    // from local maven repository
+    //compile('eu.h2020.symbiote:EnablerLogic:0.1.0-SNAPSHOT')	
+    
+
+    // test only
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+eclipse {
+    classpath {
+       downloadSources=true
+    }
+}
+
+// publication
+bootRepackage {
+    classifier = 'run'
+}
+
+jar {
+    baseName = 'EnablerLogicExample'
+    version = project.version
+}
+
+task generateJavaDocs(type: Javadoc) {
+    source = sourceSets.main.allJava
+    classpath = project.sourceSets.main.compileClasspath
+    destinationDir = reporting.file("javadocs")
+}
+
+task javadocJar(type: Jar, dependsOn: generateJavaDocs) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = project.group
+            version = project.version
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar
+
+            artifact(file("$libsDir/$project.name-$project.version-${bootRepackage.classifier}.jar")) {
+                classifier "run"
+            }
+        }
+    }
+}
+
+publishToMavenLocal.dependsOn(bootRepackage)
