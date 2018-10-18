@@ -51,12 +51,9 @@ def series_to_supervised(data, n_in=1, n_out=1, drop_nan=True):
 
 
 def scale_data(dataset):
-    encoder = LabelEncoder()
     sc = MinMaxScaler(feature_range=(0, 1))
 
     values = dataset.values
-    values[:, 0] = encoder.fit_transform(values[:, 0])
-    values[:, 1] = encoder.fit_transform(values[:, 1])
     values = values.astype('float32')
     scaled = sc.fit_transform(values)
     return series_to_supervised(scaled, TIMESTEPS, 1)
