@@ -11,16 +11,14 @@ import eu.h2020.symbiote.enablerlogic.messaging.RegistrationHandlerClientService
 import eu.h2020.symbiote.enablerlogic.messaging.properties.EnablerLogicProperties;
 import eu.h2020.symbiote.model.cim.Observation;
 import eu.h2020.symbiote.model.cim.ObservationValue;
+import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class ExampleLogic implements ProcessingLogic {
@@ -43,17 +41,22 @@ public class ExampleLogic implements ProcessingLogic {
         this.enablerLogic = enablerLogic;
     }
 
-    List<String> queryAir(String prop) {
-        List<Optional<PlatformProxyResourceInfo>> airResources = getAirResources(prop);
-        List<String> observations = new ArrayList<>();
-        for (Optional<PlatformProxyResourceInfo> airResource : airResources) {
-            observations.add(getObservation(airResource));
-        }
+    List<Sensor> queryAir(String prop) {
+        Map<Optional<PlatformProxyResourceInfo>, Pair<Double, Double>> airResources = getAirResources(prop);
+        List<Sensor> observations = new ArrayList<>();
+        airResources.forEach((airResource, location) -> {
+            Sensor sensor = getSensors(airResource);
+            if (sensor.value != null){
+                sensor.setLatitude(location.getKey());
+                sensor.setLongitude(location.getValue());
+                observations.add(sensor);
+            }
+        });
         return observations;
     }
 
-    private String getObservation(Optional<PlatformProxyResourceInfo> airResource) {
-        final String[] value = new String[1];
+    private Sensor getSensors(Optional<PlatformProxyResourceInfo> airResource) {
+        final Sensor sensor = new Sensor();
 
         airResource.ifPresent(resource -> {
             PlatformProxyTaskInfo taskInfo = new PlatformProxyTaskInfo();
@@ -68,36 +71,35 @@ public class ExampleLogic implements ProcessingLogic {
                 System.out.println(observations.size());
                 observations.forEach(observation -> System.out.println(observation.getObsValues()));
                 if (!observations.isEmpty()) {
-                    List<ObservationValue> obsValues = observations.get(observations.size() - 1).getObsValues();
-                    if (!obsValues.isEmpty())
-                        value[0] = obsValues.get(0).getValue();
+                    int index = observations.size() - 1;
+                    List<ObservationValue> obsValues = observations.get(index).getObsValues();
+                    if (!obsValues.isEmpty() &&
+                            obsValues.get(0).getValue() !=null &&
+                            obsValues.get(0).getUom().getSymbol().contains("g/m") &&
+                            !obsValues.get(0).getUom().getSymbol().contains("mg")) {
+                        sensor.value = obsValues.get(0).getValue();
+                        sensor.uom = obsValues.get(0).getUom();
+                    }
                 }
             }
         });
-        return value[0];
+        return sensor;
     }
 
-    private List<Optional<PlatformProxyResourceInfo> > getAirResources(String prop) {
-        //List<String> properties = Arrays.asList("nitrogen dioxide concentration", "ozone concentration", "carbon monoxide concentration", "Particulate matter <10um (aerosol) concentration");
-        //List<ResourceManagerTaskInfoResponse> tasks = new ArrayList<>();
-        //for (String prop : properties) {
-        //    tasks.add(getResourceManagerTaskInfoResponses(prop).get(0));
-        //}
-        List<Optional<PlatformProxyResourceInfo> > resources = new ArrayList<>();
+    private Map<Optional<PlatformProxyResourceInfo>, Pair<Double, Double>> getAirResources(String prop) {
+        HashMap<Optional<PlatformProxyResourceInfo>, Pair<Double, Double>> map = new HashMap<>();
         ResourceManagerTaskInfoResponse task = getResourceManagerTaskInfoResponses(prop).get(0);
-        // for (ResourceManagerTaskInfoResponse task : tasks) {
-            List<QueryResourceResult> resourceDescriptions = task.getResourceDescriptions();
-            for (QueryResourceResult resource : resourceDescriptions) {
-                String resourceId = resource.getId();
-                String accessURL = task.getResourceUrls().get(resourceId);
+        List<QueryResourceResult> resourceDescriptions = task.getResourceDescriptions();
+        for (QueryResourceResult resource : resourceDescriptions) {
+            String resourceId = resource.getId();
+            String accessURL = task.getResourceUrls().get(resourceId);
 
-                PlatformProxyResourceInfo info = new PlatformProxyResourceInfo();
-                info.setAccessURL(accessURL);
-                info.setResourceId(resourceId);
-                resources.add(Optional.of(info));
-            }
-        //}
-        return resources;
+            PlatformProxyResourceInfo info = new PlatformProxyResourceInfo();
+            info.setAccessURL(accessURL);
+            info.setResourceId(resourceId);
+            map.put(Optional.of(info), new Pair<>(resource.getLocationLatitude(), resource.getLocationLongitude()));
+        }
+        return map;
 
     }
 

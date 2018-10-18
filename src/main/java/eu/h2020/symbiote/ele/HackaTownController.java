@@ -4,9 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class HackaTownController {
@@ -15,17 +13,15 @@ public class HackaTownController {
     ExampleLogic exampleLogic;
 
     @GetMapping("/getData")
-    public List<List<String> > getData() {
-        List<String> properties = Arrays.asList("nitrogen dioxide concentration",
-                //"ozone concentration",
-                "carbon monoxide concentration"
-                // "Particulate matter <10um (aerosol) concentration"
-        );
-        List<List<String> > result = new ArrayList<>(new ArrayList<>());
-        for (String prop : properties) {
-            result.add(exampleLogic.queryAir(prop));
-        }
-        return result;
+    public Map<String, List<Sensor>> getData() {
+        Map<String, String> tags = new HashMap<>();
+        // tags.put("carbon monoxide concentration","co2");
+        tags.put("volatile PM10 concentration","PM10");
+        tags.put("nitrogen dioxide concentration", "no2");
+
+        Map<String, List<Sensor>> sensors = new HashMap<>();
+        tags.forEach ((key, value) -> sensors.put(value, exampleLogic.queryAir(key)));
+        return sensors;
     }
 
 }
