@@ -339,12 +339,12 @@ demo = {
     ctx = document.getElementById('lineChartExampleWithNumbersAndGrid').getContext("2d");
 
     gradientStroke = ctx.createLinearGradient(500, 0, 100, 0);
-    gradientStroke.addColorStop(0, '#18ce0f');
+    gradientStroke.addColorStop(0, '#80b6f4');
     gradientStroke.addColorStop(1, chartColor);
 
     gradientFill = ctx.createLinearGradient(0, 170, 0, 50);
     gradientFill.addColorStop(0, "rgba(128, 182, 244, 0)");
-    gradientFill.addColorStop(1, hexToRGB('#18ce0f', 0.4));
+    gradientFill.addColorStop(1, "rgba(249, 99, 59, 0.40)");
 
     myChart = new Chart(ctx, {
       type: 'line',
@@ -366,7 +366,7 @@ demo = {
           data: [40, 500, 650, 700, 1200, 1250, 1300, 1900]
         }]
       },
-      options: gradientChartOptionsConfigurationWithNumbersAndGrid
+      options: gradientChartOptionsConfiguration
     });
 
     var e = document.getElementById("barChartSimpleGradientsNumbers").getContext("2d");
