@@ -16,7 +16,11 @@ public class HackaTownController {
 
     @GetMapping("/getData")
     public List<List<String> > getData() {
-        List<String> properties = Arrays.asList("nitrogen dioxide concentration", "ozone concentration", "carbon monoxide concentration", "Particulate matter <10um (aerosol) concentration");
+        List<String> properties = Arrays.asList("nitrogen dioxide concentration",
+                //"ozone concentration",
+                "carbon monoxide concentration",
+                // "Particulate matter <10um (aerosol) concentration"
+        );
         List<List<String> > result = new ArrayList<>(new ArrayList<>());
         for (String prop : properties) {
             result.add(exampleLogic.queryAir(prop));
