@@ -19,8 +19,8 @@
   <!-- CSS Just for demo purpose, don't include it in your project -->
   <link href="../assets/demo/demo.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.2.1/css/bootstrap-slider.min.css" rel="stylesheet"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.2.1/bootstrap-slider.min.js"></script> 
-  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.2.1/bootstrap-slider.min.js"></script>
+
 
 </head>
 
@@ -32,7 +32,7 @@
       width: 60%;
     }
   </style>
-    
+
   <div class="wrapper ">
     <div class="sidebar" data-color="orange">
       <!--
@@ -79,7 +79,7 @@
             <span class="navbar-toggler-bar navbar-kebab"></span>
             <span class="navbar-toggler-bar navbar-kebab"></span>
           </button>
-         
+
         </div>
       </nav>
       <!-- End Navbar -->
@@ -94,7 +94,7 @@
                     <div class="col-lg-12 ml-auto mr-auto">
                         <div class="row">
                           <div class="col-md-3">
-                              <button  class="btn btn-primary btn-block" onclick="toggleHeatmap()">Activate / deactivate</button>
+                              <button  class="btn btn-primary btn-block" onclick="toggleHeatmap()">Change metrics</button>
                           </div>
                           <div class="col-md-3">
                               <button class="btn btn-primary btn-block" onclick="changeGradient()">Change color</button>
@@ -142,15 +142,15 @@
   </script>-->
   <script>
 
-    var map, heatmap;
-    
+    var map, heatmap, metric = false;
+
     function initMap() {
       map = new google.maps.Map(document.getElementById('map'), {
         zoom: 11.4,
         center: {lat: 45.7945, lng: 15.95845},
         mapTypeId: google.maps.MapTypeId.SATELLITE
       });
-    
+
       getPoints(function(points) {
           heatmap = new google.maps.visualization.HeatmapLayer({
           data: points,
@@ -158,13 +158,13 @@
           radius: 20
         });
       })
-      
+
     }
-    
+
     function toggleHeatmap() {
-      map.setMap(heatmap.getMap() ? null : map);
+      metric = !metric;
     }
-    
+
     function changeGradient() {
       var gradient = [
         'rgba(0, 255, 255, 0)',
@@ -184,28 +184,29 @@
       ]
       heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
     }
-    
+
     function changeRadius() {
       heatmap.set('radius', heatmap.get('radius') ? 50 : 100);
     }
-    
+
     function changeOpacity() {
       heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
     }
-    
+
     // Heatmap data: 500 Points
     function getPoints(callback, offset) {
     //API_URL = 'http://46.101.56.168:8080';
       API_URL = 'http://localhost:8080/';
       $.get(API_URL + '?min_lat=45.740&min_lng=15.8360&max_lat=45.849&max_lng=16.0809&steps=30&offset=' + offset, function (data) {
           var result = data.map(function (point) {
-            return {location: new google.maps.LatLng(point.lat, point.lng), weight: point.weight}
+            return {location: new google.maps.LatLng(point.lat, point.lng), weight: metric ? point.pm10 : point.no2}
           });
           callback(result);
       });
     }
     $('#ex1Slider').on('input change', function(ev) {
       getPoints(function(points) {
+          heatmap.setMap(null);
           heatmap = new google.maps.visualization.HeatmapLayer({
           data: points,
           map: map,
@@ -213,7 +214,7 @@
         });
       }, ev.target.value)
     });
-    
+
         </script>
         <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBwJFiyPp5W--JhIrrLCzhP6TYCHBa4Nn0&libraries=visualization&callback=initMap">
