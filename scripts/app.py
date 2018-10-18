@@ -5,6 +5,7 @@ from interpolate import interpolate_data
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route('/', methods=['GET'])
 def get_data():
     min_lat = request.args.get('min_lat', type=float)

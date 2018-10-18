@@ -7,22 +7,20 @@ from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 
-TIMESTEPS = 14
-EPOCHS = 20
+TIMESTEPS = 70
+EPOCHS = 100
 BATCH_SIZE = 32
-FEATURES = 8
+FEATURES = 2
 
 
 def preprocess_dataset():
-    dataset = pd.read_csv('dataset_1.csv', parse_dates=[['year', 'month', 'day', 'hour']], index_col=0,
+    dataset = pd.read_csv('dataset.csv', parse_dates=[['year', 'month', 'day', 'hour']], index_col=0,
                           date_parser=lambda d: datetime.strptime(d, '%Y %m %d %H'))
-    dataset.drop('NO', axis=1, inplace=True)
-    dataset.columns = ['pollution', 'dew', 'temp', 'press', 'wnd_dir', 'wnd_spd', 'snow', 'rain']
     dataset.index.name = 'date'
 
     plt.figure()
-    for group in range(0, 7):
-        plt.subplot(7, 1, group + 1)
+    for group in range(0, 2):
+        plt.subplot(2, 1, group + 1)
         plt.plot(dataset.values[:, group])
         plt.title(dataset.columns[group], y=0.5, loc='right')
     plt.show()
@@ -57,7 +55,8 @@ def scale_data(dataset):
     sc = MinMaxScaler(feature_range=(0, 1))
 
     values = dataset.values
-    values[:, 4] = encoder.fit_transform(values[:, 4])
+    values[:, 0] = encoder.fit_transform(values[:, 0])
+    values[:, 1] = encoder.fit_transform(values[:, 1])
     values = values.astype('float32')
     scaled = sc.fit_transform(values)
     return series_to_supervised(scaled, TIMESTEPS, 1)
