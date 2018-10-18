@@ -18,7 +18,7 @@ public class HackaTownController {
     public List<List<String> > getData() {
         List<String> properties = Arrays.asList("nitrogen dioxide concentration",
                 //"ozone concentration",
-                "carbon monoxide concentration",
+                "carbon monoxide concentration"
                 // "Particulate matter <10um (aerosol) concentration"
         );
         List<List<String> > result = new ArrayList<>(new ArrayList<>());
