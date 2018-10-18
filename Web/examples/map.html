@@ -116,7 +116,7 @@
           </div>
         </div>
       </div>
-      <input id="ex1Slider" data-slider-id='ex1Slider' type="range" class="custom-range"/>
+      <input id="ex1Slider" data-slider-id='ex1Slider' type="range" class="custom-range" min="0" max="24" step="1"/>
     </div>
   </div>
   <!--   Core JS Files   -->
@@ -155,7 +155,7 @@
           heatmap = new google.maps.visualization.HeatmapLayer({
           data: points,
           map: map,
-          radius: 25
+          radius: 20
         });
       })
       
@@ -194,21 +194,25 @@
     }
     
     // Heatmap data: 500 Points
-    function getPoints(callback) {
+    function getPoints(callback, offset) {
     //API_URL = 'http://46.101.56.168:8080';
       API_URL = 'http://localhost:8080/';
-      $.get(API_URL + '?min_lat=45.740&min_lng=15.8360&max_lat=45.849&max_lng=16.0809&steps=30', function (data) {
+      $.get(API_URL + '?min_lat=45.740&min_lng=15.8360&max_lat=45.849&max_lng=16.0809&steps=30&offset=' + offset, function (data) {
           var result = data.map(function (point) {
             return {location: new google.maps.LatLng(point.lat, point.lng), weight: point.weight}
           });
           callback(result);
       });
     }
-    $('#ex1Slider').change(function() {
-      $('#slider-change').slider('slidechange', function(value) {
-      console.log() ;
+    $('#ex1Slider').on('input change', function(ev) {
+      getPoints(function(points) {
+          heatmap = new google.maps.visualization.HeatmapLayer({
+          data: points,
+          map: map,
+          radius: 20
+        });
+      }, ev.target.value)
     });
-  })
     
         </script>
         <script async defer
