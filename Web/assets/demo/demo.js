@@ -84,7 +84,7 @@ demo = {
       type: 'line',
       responsive: true,
       data: {
-        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        labels: ["0", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
         datasets: [{
           label: "Active Users",
           borderColor: "#f96332",
@@ -222,7 +222,7 @@ demo = {
     var myChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+        labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24],
         datasets: [{
           label: "Data",
           borderColor: chartColor,
@@ -237,7 +237,7 @@ demo = {
           fill: true,
           backgroundColor: gradientFill,
           borderWidth: 2,
-          data: [50, 150, 100, 190, 130, 90, 150, 160, 120, 140, 190, 95]
+          data: [92, 79, 60, 50, 50, 55, 102, 120, 130, 135, 110, 121, 112, 105, 140, 139, 121, 145, 136, 120, 110, 115, 100, 90]
         }]
       },
       options: {
@@ -378,7 +378,7 @@ demo = {
     var a = {
       type: "bar",
       data: {
-        labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        labels: ["0", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
         datasets: [{
           label: "Active Countries",
           backgroundColor: gradientFill,
