@@ -15,8 +15,10 @@ def get_data():
     if None in [min_lat, min_lng, max_lat, max_lng]:
         return 'Missing parameters', 400
 
-    steps = request.args.get('steps', 10)
-    response = interpolate_data(min_lat, min_lng, max_lat, max_lng, steps)
+    steps = request.args.get('steps', 10, type=int)
+    offset = request.args.get('offset', 0, type=int)
+
+    response = interpolate_data(min_lat, min_lng, max_lat, max_lng, steps, offset)
     return jsonify(response)
 
 
