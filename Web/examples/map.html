@@ -45,18 +45,19 @@
       </div>
       <div class="sidebar-wrapper">
         <ul class="nav">
+            <li class="active ">
+                <a href="./map.html">
+                  <i class="now-ui-icons location_map-big"></i>
+                  <p>Maps</p>
+                </a>
+              </li>
           <li>
             <a href="./dashboard.html">
               <i class="now-ui-icons design_app"></i>
               <p>Dashboard</p>
             </a>
           </li>
-          <li class="active ">
-            <a href="./map.html">
-              <i class="now-ui-icons location_map-big"></i>
-              <p>Maps</p>
-            </a>
-
+          
         </ul>
       </div>
     </div>
@@ -195,7 +196,6 @@
 
     // Heatmap data: 500 Points
     function getPoints(callback, offset) {
-    //API_URL = 'http://46.101.56.168:8080';
       API_URL = 'http://localhost:8080/';
       $.get(API_URL + '?min_lat=45.740&min_lng=15.8360&max_lat=45.849&max_lng=16.0809&steps=30&offset=' + offset, function (data) {
           var result = data.map(function (point) {
